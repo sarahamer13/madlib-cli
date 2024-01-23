@@ -9,7 +9,6 @@ def print_welcome_message():
     print("Welcome to the Madlibs Game!")
     print("You will be asked to input some words to play the game.")
     print("When done, you'll receive a funny story!")
-    print("Your completed madlibs will be saved in a filled_template.txt file.")
     print("To exit at any time, type 'x' and press enter.")
 
 # function to open and read the file
@@ -17,40 +16,54 @@ def read_template(file_path):
     try:
         with open(file_path, 'r') as file:
             template_content = file.read().strip()
-            print(f"Template content:\n{template_content}")
+            # print(f"Template content:\n{template_content}")
             return template_content
     except FileNotFoundError:
         raise FileNotFoundError(f"File not found at {file_path}")
 
 # function ti find placeholders in the provided template and replace them with curly brackets
+# def parse_template(template):
+#     # Pattern to match placeholders like '{}' or '<>'
+#     # raw string, closing quote, \ escape the { character
+#     #.*? march as few characters as possible while allowing the overall pattern to match
+#     # | match anything in curly or brackets
+#     # [.*?\] this part of the pattern matches text enclosed in square brackets []. Similar to the curly braces part,
+#     # \: The backslash escapes the [ character to match a literal [.
+#     #.*?: This part matches any character zero or more times
+
+#     pattern = r"\{.*?\}|\[.*?\]"
+
+#     # Find all placeholders
+#     language_parts = re.findall(pattern, template)
+
+#     # Replace placeholders with '{}'
+#     parsed_template = re.sub(pattern, "{}", template)
+
+#     return parsed_template, language_parts
+    
 def parse_template(template):
-    # Pattern to match placeholders like '{}' or '<>'
-    # raw string, closing quote, \ escape the { character
-    #.*? march as few characters as possible while allowing the overall pattern to match
-    # | match anything in curly or brackets
-    # [.*?\] this part of the pattern matches text enclosed in square brackets []. Similar to the curly braces part,
-    # \: The backslash escapes the [ character to match a literal [.
-    #.*?: This part matches any character zero or more times
+    # Pattern to match placeholders like '{Adjective}'
+    pattern = r"\{(.*?)\}"
 
-    pattern = r"\{.*?\}|\[.*?\]"
-
-    # Find all placeholders
+    # Find all placeholders, capturing only the content inside the curly braces
     language_parts = re.findall(pattern, template)
 
     # Replace placeholders with '{}'
     parsed_template = re.sub(pattern, "{}", template)
 
-    return parsed_template, language_parts
+    return parsed_template, tuple(language_parts)
+
 
 # function iterate over the list of placeholders, it prompts the user for input for each and return a list of these inputs
 def get_user_inputs(language_parts):
     user_inputs = []
     for part in language_parts:
-        user_input = input(f"Enter {part[1:-1]}: ")
+        user_input = input(f"Enter {part}: ")
         if user_input.lower() == 'x':
             exit_game()
         user_inputs.append(user_input)
     return user_inputs
+
 
 # function print and exit message
 def exit_game():
@@ -103,8 +116,14 @@ def main():
         # Display completed Madlib
         display_completed_madlib(completed_madlib)
 
+       # Determine the output file name based on the template
+        if 'dark_and_stormy_night_template.txt' in template_path:
+            output_file = 'dark_and_stormy_output.txt'
+        else:
+            output_file = 'filled_template.txt'  # or any other default filename
+
         # Write the completed Madlib to a file
-        write_to_file(completed_madlib, 'filled_template.txt')
+        write_to_file(completed_madlib, output_file)
 
     except Exception as e:
         print(f"An error occurred: {e}")

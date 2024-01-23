@@ -19,7 +19,7 @@
 
 #### How to initialize/run your application
 
-- python3 madlib.py
+- python3 madlib-cli/madlib.py
 
 #### Attribution
 
